@@ -1,0 +1,27 @@
+* {
+    user-select: none;
+}
+
+.container {
+    max-width: 500px;
+    margin: auto;
+}
+
+.divs {
+    padding: 10px;
+    margin: 10px;
+    border: 1px solid;
+}
+
+.job-div {
+    padding: 10px;
+    margin: 5px;
+}
+
+.job-div:hover {
+    text-decoration: underline;
+}
+
+.currentJob {
+    font-weight: bold;
+}

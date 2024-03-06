@@ -3,6 +3,7 @@ var recDiv = document.querySelector(".resources")
 
 var currentJob = 0
 var lastSave = Date.now()
+var lastTick = Date.now()
 
 var resources = [
     {name: "Credits", amount: 0, new: false},
@@ -78,10 +79,14 @@ function changeJob(index) {
     updateJobs()
 }
 
-setInterval(gameLoop, 1000)
+setInterval(gameLoop, 50)
 
 function gameLoop() {
-    getResources(1)
+    if ( Date.now() >= lastTick + 1000 ) {
+        var ticks = Math.round( (Date.now() - lastTick) / 1000)
+        lastTick = Date.now()
+        getResources(ticks)
+    }
     updateDisplay()
     if (Date.now() > lastSave + 10000) saveGame() // save every 10 seconds
 }
@@ -102,6 +107,7 @@ function saveGame() {
     var gameSave = {
         currentJob: currentJob,
         lastSave: lastSave,
+        lastTick: lastTick,
         resources: resources
     }
     localStorage.setItem("gameSave",JSON.stringify(gameSave))
@@ -111,7 +117,8 @@ function loadGame() {
     var savedGame = JSON.parse(localStorage.getItem("gameSave"))
     if (localStorage.getItem("gameSave") !== null) {
         if (typeof savedGame.currentJob !== "undefined") currentJob = savedGame.currentJob
-        if (typeof savedGame.lastSave !== "undefined") lastSave = savedGame.lastSave;
+        if (typeof savedGame.lastSave !== "undefined") lastSave = savedGame.lastSave
+        if (typeof savedGame.lastTick !== "undefined") lastSave = savedGame.lastTick
         if (typeof savedGame.resources !== "undefined") {
             for (i=0; i<savedGame.resources.length; i++) {
                 resources[i].amount = savedGame.resources[i].amount

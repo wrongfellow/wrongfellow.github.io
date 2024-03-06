@@ -3,7 +3,8 @@ var recDiv = document.querySelector(".resources")
 
 var currentJob = 0
 var lastSave = Date.now()
-var lastTick = Date.now()
+var loopSpeed = 1000
+var lastGet = Date.now()
 
 var resources = [
     {name: "Credits", amount: 0, new: false},
@@ -68,7 +69,7 @@ function updateResources() {
     resources.forEach( (rec, index) => {
         if (rec.amount > 0) rec.new = false
         if (rec.new === false) {
-            recHTML += "<div>" + rec.name + ": " + rec.amount + "</div>"
+            recHTML += "<div>" + rec.name + ": " + Math.floor(rec.amount) + "</div>"
         }
     })
     recDiv.innerHTML = recHTML
@@ -79,16 +80,21 @@ function changeJob(index) {
     updateJobs()
 }
 
-setInterval(gameLoop, 50)
+setInterval(gameLoop, loopSpeed)
 
 function gameLoop() {
-    if ( Date.now() >= lastTick + 1000 ) {
-        var ticks = Math.round( (Date.now() - lastTick) / 1000)
-        lastTick = Date.now()
-        getResources(ticks)
-    }
+    getResources(loopSpeed / 1000)
     updateDisplay()
     if (Date.now() > lastSave + 10000) saveGame() // save every 10 seconds
+}
+
+function getResources(ticks) {
+    var diff = Date.now() - lastGet
+    lastGet = Date.now()
+    console.log(ticks, diff)
+    jobs[currentJob].reward.forEach( (rew) => {
+        resources[rew.resource].amount += rew.amount * ticks * diff/loopSpeed
+    })
 }
 
 function updateDisplay() {
@@ -96,18 +102,11 @@ function updateDisplay() {
     updateResources()
 }
 
-function getResources(ticks) {
-    jobs[currentJob].reward.forEach( (rew) => {
-        resources[rew.resource].amount += rew.amount * ticks
-    })
-}
-
 function saveGame() {
     lastSave = Date.now()
     var gameSave = {
         currentJob: currentJob,
         lastSave: lastSave,
-        lastTick: lastTick,
         resources: resources
     }
     localStorage.setItem("gameSave",JSON.stringify(gameSave))
@@ -117,8 +116,7 @@ function loadGame() {
     var savedGame = JSON.parse(localStorage.getItem("gameSave"))
     if (localStorage.getItem("gameSave") !== null) {
         if (typeof savedGame.currentJob !== "undefined") currentJob = savedGame.currentJob
-        if (typeof savedGame.lastSave !== "undefined") lastSave = savedGame.lastSave
-        if (typeof savedGame.lastTick !== "undefined") lastSave = savedGame.lastTick
+        if (typeof savedGame.lastSave !== "undefined") lastSave = savedGame.lastSave;
         if (typeof savedGame.resources !== "undefined") {
             for (i=0; i<savedGame.resources.length; i++) {
                 resources[i].amount = savedGame.resources[i].amount

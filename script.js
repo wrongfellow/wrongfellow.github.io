@@ -14,11 +14,8 @@ function jobsClick(e) {
 jobsDiv.addEventListener("mousedown", jobsClick, false);
 jobsDiv.addEventListener("touchstart", jobsClick, false);
 
-
-
 var currentJob = 0
 var lastSave = Date.now()
-var loopSpeed = 1000
 var last_time = Date.now()
 
 var resources = [
@@ -95,52 +92,25 @@ function changeJob(index) {
     updateJobs()
 }
 
-
-
-
-// setInterval(gameLoop, loopSpeed)
-
-// function gameLoop() {
-//     getResources(loopSpeed / 1000)
-//     updateDisplay()
-//     if (Date.now() > lastSave + 10000) saveGame() // save every 10 seconds
-// }
-
-
 function gameLoop(current_time) {
     if (last_time === null) last_time = current_time;
     const delta_time = current_time - last_time;
-    // console.log(current_time, delta_time)
     last_time = current_time;
     
     if (delta_time > 0) getResources(delta_time);
     updateDisplay()
     
+    if (Date.now() > lastSave + 10000) saveGame()
+
     requestAnimationFrame(gameLoop);
 }
-
 requestAnimationFrame(gameLoop);
 
-
-
-// function getResources(ticks) {
-//     var diff = Date.now() - lastGet
-//     console.log(ticks, diff)
-//     jobs[currentJob].reward.forEach( (rew) => {
-//         resources[rew.resource].amount += rew.amount * ticks * diff/loopSpeed
-//     })
-// }
-
 function getResources(delta) {
-    // console.log(delta)
     jobs[currentJob].reward.forEach( (rew) => {
         resources[rew.resource].amount += rew.amount * (delta/1000)
-        // console.log(resources[rew.resource].amount, rew.amount, delta)
     })
 }
-
-
-
 
 function updateDisplay() {
     updateJobs()
@@ -167,11 +137,9 @@ function loadGame() {
                 resources[i].amount = savedGame.resources[i].amount
             }
         }
-        if ( Date.now() > lastSave + 10000 ) {
-            var timeGone = Math.floor( (Date.now() - lastSave) / 1000 )
-            getResources(timeGone)
-            alert("You have been gone for " + timeGone + " seconds.  Resources have been updated.")
-        }
+        var timeGone = Math.floor( Date.now() - lastSave )
+        getResources(timeGone)
+        alert("You have been gone for " + Math.floor(timeGone/1000) + " seconds.  Resources have been updated.")
     }
     updateDisplay()
 }

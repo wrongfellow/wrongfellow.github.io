@@ -11,6 +11,7 @@ function jobsClick(e) {
 }
 
 jobsDiv.addEventListener("mousedown", jobsClick, false);
+jobsDiv.addEventListener("touchstart", jobsClick, false);
 
 
 

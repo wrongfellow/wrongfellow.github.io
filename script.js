@@ -4,11 +4,12 @@ var recDiv = document.querySelector(".resources")
 function jobsClick(e) {
     var target = e.target
     if (!target) target = e.touchs[0].target
+    alert(target.innerText)
     if ( target.classList.contains('job-div') ) {
-      console.log(target.innerText);
-      jobs.forEach( (job, index) => {
-        if (job.name === target.innerText) changeJob(index)
-      })
+        console.log(target.innerText);
+        jobs.forEach( (job, index) => {
+            if (job.name === target.innerText) changeJob(index)
+        })
     }
 }
 

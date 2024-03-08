@@ -1,10 +1,23 @@
 var jobsDiv = document.querySelector(".jobs")
 var recDiv = document.querySelector(".resources")
 
+function jobsClick(e) {
+    if (e.target.classList.contains('job-div')) {
+      console.log(e.target.innerText);
+      jobs.forEach( (job, index) => {
+        if (job.name === e.target.innerText) changeJob(index)
+      })
+    }
+}
+
+jobsDiv.addEventListener("mousedown", jobsClick, false);
+
+
+
 var currentJob = 0
 var lastSave = Date.now()
 var loopSpeed = 1000
-var lastGet = Date.now()
+var last_time = Date.now()
 
 var resources = [
     {name: "Credits", amount: 0, new: false},
@@ -80,22 +93,52 @@ function changeJob(index) {
     updateJobs()
 }
 
-setInterval(gameLoop, loopSpeed)
 
-function gameLoop() {
-    getResources(loopSpeed / 1000)
+
+
+// setInterval(gameLoop, loopSpeed)
+
+// function gameLoop() {
+//     getResources(loopSpeed / 1000)
+//     updateDisplay()
+//     if (Date.now() > lastSave + 10000) saveGame() // save every 10 seconds
+// }
+
+
+function gameLoop(current_time) {
+    if (last_time === null) last_time = current_time;
+    const delta_time = current_time - last_time;
+    // console.log(current_time, delta_time)
+    last_time = current_time;
+    
+    if (delta_time > 0) getResources(delta_time);
     updateDisplay()
-    if (Date.now() > lastSave + 10000) saveGame() // save every 10 seconds
+    
+    requestAnimationFrame(gameLoop);
 }
 
-function getResources(ticks) {
-    var diff = Date.now() - lastGet
-    lastGet = Date.now()
-    console.log(ticks, diff)
+requestAnimationFrame(gameLoop);
+
+
+
+// function getResources(ticks) {
+//     var diff = Date.now() - lastGet
+//     console.log(ticks, diff)
+//     jobs[currentJob].reward.forEach( (rew) => {
+//         resources[rew.resource].amount += rew.amount * ticks * diff/loopSpeed
+//     })
+// }
+
+function getResources(delta) {
+    // console.log(delta)
     jobs[currentJob].reward.forEach( (rew) => {
-        resources[rew.resource].amount += rew.amount * ticks * diff/loopSpeed
+        resources[rew.resource].amount += rew.amount * (delta/1000)
+        // console.log(resources[rew.resource].amount, rew.amount, delta)
     })
 }
+
+
+
 
 function updateDisplay() {
     updateJobs()
@@ -113,8 +156,8 @@ function saveGame() {
 }
 
 function loadGame() {
-    var savedGame = JSON.parse(localStorage.getItem("gameSave"))
     if (localStorage.getItem("gameSave") !== null) {
+        var savedGame = JSON.parse(localStorage.getItem("gameSave"))
         if (typeof savedGame.currentJob !== "undefined") currentJob = savedGame.currentJob
         if (typeof savedGame.lastSave !== "undefined") lastSave = savedGame.lastSave;
         if (typeof savedGame.resources !== "undefined") {

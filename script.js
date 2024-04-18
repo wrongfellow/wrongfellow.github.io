@@ -139,7 +139,7 @@ function loadGame() {
         }
         var timeGone = Math.floor( Date.now() - lastSave )
         getResources(timeGone)
-        alert("You have been gone for " + Math.floor(timeGone/1000) + " seconds.  Resources have been updated.")
+        if (typeof savedGame.lastSave !== "undefined") alert("You have been gone for " + Math.floor(timeGone/1000) + " seconds.  Resources have been updated.")
     }
     updateDisplay()
 }
